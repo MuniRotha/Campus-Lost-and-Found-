@@ -1,0 +1,46 @@
+<%- include('../partials/header', { title: mode === 'new' ? 'New post' : 'Edit post' }) %>
+<section class="panel narrow">
+  <h1><%= mode === 'new' ? 'Post an item' : 'Edit post' %></h1>
+  <%- include('../partials/errors', { errors }) %>
+  <form action="<%= mode === 'new' ? '/items' : '/items/' + post.id + '/edit' %>" method="post" enctype="multipart/form-data" novalidate>
+    <label for="title">Title</label>
+    <input id="title" name="title" type="text" maxlength="100" value="<%= post.title || '' %>" required>
+
+    <label for="kind">Did you lose it or find it?</label>
+    <select id="kind" name="kind" required>
+      <option value="lost" <%= post.kind === 'lost' ? 'selected' : '' %>>Lost</option>
+      <option value="found" <%= post.kind === 'found' ? 'selected' : '' %>>Found</option>
+    </select>
+
+    <label for="category_id">Category</label>
+    <select id="category_id" name="category_id" required>
+      <option value="">Choose a category</option>
+      <% categories.forEach(c => { %><option value="<%= c.id %>" <%= String(post.category_id) === String(c.id) ? 'selected' : '' %>><%= c.name %></option><% }) %>
+    </select>
+
+    <label for="location">Location (optional)</label>
+    <input id="location" name="location" type="text" maxlength="100" value="<%= post.location || '' %>">
+
+    <label for="description">Description</label>
+    <textarea id="description" name="description" rows="5" maxlength="2000" required><%= post.description || '' %></textarea>
+
+    <label for="status">Status</label>
+    <select id="status" name="status">
+      <option value="open" <%= post.status === 'open' ? 'selected' : '' %>>Open</option>
+      <option value="resolved" <%= post.status === 'resolved' ? 'selected' : '' %>>Resolved</option>
+    </select>
+
+    <label for="image">Image (optional, JPEG or PNG, max 2 MB)</label>
+    <% if (mode === 'edit' && post.image_path) { %>
+      <p><img src="/uploads/<%= post.image_path %>" alt="Current image" class="thumb-small"></p>
+      <label class="check"><input type="checkbox" name="remove_image" value="1"> Remove current image</label>
+    <% } %>
+    <input id="image" name="image" type="file" accept="image/jpeg,image/png">
+
+    <div class="row-actions">
+      <button type="submit" class="btn"><%= mode === 'new' ? 'Create post' : 'Save changes' %></button>
+      <a class="btn btn-light" href="<%= mode === 'new' ? '/items' : '/items/' + post.id %>">Cancel</a>
+    </div>
+  </form>
+</section>
+<%- include('../partials/footer') %>

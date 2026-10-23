@@ -4,6 +4,7 @@ const session = require('express-session');
 const path = require('path');
 
 const authRoutes = require('./routes/auth');
+const itemRoutes = require('./routes/items');
 
 if (!process.env.SESSION_SECRET) {
   console.error('SESSION_SECRET is missing. Copy .env.example to .env and fill it in.');
@@ -31,8 +32,9 @@ app.use((req, res, next) => {
   next();
 });
 
-app.get('/', (req, res) => res.redirect('/login'));
+app.get('/', (req, res) => res.redirect('/items'));
 app.use('/', authRoutes);
+app.use('/items', itemRoutes);
 
 // 404 for unknown URLs
 app.use((req, res) => res.status(404).render('error', { code: 404, message: 'Page not found.' }));

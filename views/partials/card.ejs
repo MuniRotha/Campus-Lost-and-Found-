@@ -1,0 +1,16 @@
+<article class="card">
+  <% if (item.image_path) { %>
+    <img src="/uploads/<%= item.image_path %>" alt="Photo of <%= item.title %>" class="thumb">
+  <% } else { %>
+    <div class="thumb placeholder" aria-label="No image provided">No image</div>
+  <% } %>
+  <div class="card-body">
+    <div class="badges">
+      <span class="badge badge-<%= item.kind %>"><%= item.kind %></span>
+      <span class="badge badge-<%= item.status %>"><%= item.status %></span>
+      <span class="badge badge-cat"><%= item.category %></span>
+    </div>
+    <h3><a href="/items/<%= item.id %>"><%= item.title %></a></h3>
+    <p class="muted">By <%= item.owner %> &middot; <%= new Date(item.created_at).toLocaleDateString('en-GB') %><% if (item.location) { %> &middot; <%= item.location %><% } %></p>
+  </div>
+</article>

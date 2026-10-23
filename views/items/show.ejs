@@ -1,0 +1,32 @@
+<%- include('../partials/header', { title: post.title }) %>
+<p><a href="/items">&larr; Back to board</a></p>
+<section class="panel detail">
+  <% if (post.image_path) { %>
+    <img src="/uploads/<%= post.image_path %>" alt="Photo of <%= post.title %>" class="detail-img">
+  <% } else { %>
+    <div class="detail-img placeholder" aria-label="No image provided">No image</div>
+  <% } %>
+  <div>
+    <div class="badges">
+      <span class="badge badge-<%= post.kind %>"><%= post.kind %></span>
+      <span class="badge badge-<%= post.status %>"><%= post.status %></span>
+      <span class="badge badge-cat"><%= post.category %></span>
+    </div>
+    <h1><%= post.title %></h1>
+    <p class="muted">Posted by <strong><%= post.owner %></strong> on <%= new Date(post.created_at).toLocaleDateString('en-GB') %><% if (post.location) { %> &middot; Location: <%= post.location %><% } %></p>
+    <p class="pre"><%= post.description %></p>
+
+    <% if (currentUser && currentUser.id === post.user_id) { %>
+      <div class="row-actions">
+        <a class="btn" href="/items/<%= post.id %>/edit">Edit</a>
+        <% if (post.status !== 'resolved') { %>
+          <form action="/items/<%= post.id %>/resolve" method="post" class="inline"><button type="submit" class="btn btn-light">Mark as resolved</button></form>
+        <% } %>
+        <form action="/items/<%= post.id %>/delete" method="post" class="inline" onsubmit="return confirm('Delete this post permanently?');">
+          <button type="submit" class="btn btn-danger">Delete</button>
+        </form>
+      </div>
+    <% } %>
+  </div>
+</section>
+<%- include('../partials/footer') %>

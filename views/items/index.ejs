@@ -1,0 +1,32 @@
+<%- include('../partials/header', { title: 'Browse' }) %>
+<h1>Lost &amp; Found Board</h1>
+<form class="filters" action="/items" method="get" role="search">
+  <div>
+    <label for="q">Keyword</label>
+    <input id="q" name="q" type="search" value="<%= filters.q %>" placeholder="e.g. backpack">
+  </div>
+  <div>
+    <label for="category">Category</label>
+    <select id="category" name="category">
+      <option value="">All categories</option>
+      <% categories.forEach(c => { %><option value="<%= c.id %>" <%= filters.category === String(c.id) ? 'selected' : '' %>><%= c.name %></option><% }) %>
+    </select>
+  </div>
+  <div>
+    <label for="kind">Type</label>
+    <select id="kind" name="kind">
+      <option value="">Lost &amp; found</option>
+      <option value="lost" <%= filters.kind === 'lost' ? 'selected' : '' %>>Lost</option>
+      <option value="found" <%= filters.kind === 'found' ? 'selected' : '' %>>Found</option>
+    </select>
+  </div>
+  <div class="actions"><button type="submit" class="btn">Search</button> <a class="btn btn-light" href="/items">Reset</a></div>
+</form>
+
+<p class="muted"><%= items.length %> result<%= items.length === 1 ? '' : 's' %></p>
+<% if (!items.length) { %>
+  <div class="panel center"><p>No items match your search. Try different keywords or <a href="/items">clear the filters</a>.</p></div>
+<% } else { %>
+  <div class="grid"><% items.forEach(item => { %><%- include('../partials/card', { item }) %><% }) %></div>
+<% } %>
+<%- include('../partials/footer') %>
