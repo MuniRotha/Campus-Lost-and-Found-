@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node app.js",
     "db:setup": "node scripts/setup-db.js",
-    "create-user": "node scripts/create-user.js"
+    "create-user": "node scripts/create-user.js",
+    "test:smoke": "node tests/smoke-test.js"
   },
   "license": "MIT",
   "dependencies": {
