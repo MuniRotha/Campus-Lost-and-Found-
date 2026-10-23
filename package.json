@@ -1,0 +1,21 @@
+{
+  "name": "campus-lost-and-found",
+  "version": "1.0.0",
+  "description": "Campus Lost & Found board: post, search and manage lost and found items (Node.js, Express, MySQL, EJS)",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "db:setup": "node scripts/setup-db.js",
+    "create-user": "node scripts/create-user.js"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^16.4.5",
+    "ejs": "^3.1.10",
+    "express": "^4.19.2",
+    "express-session": "^1.18.0",
+    "multer": "^1.4.5-lts.1",
+    "mysql2": "^3.11.0"
+  }
+}
