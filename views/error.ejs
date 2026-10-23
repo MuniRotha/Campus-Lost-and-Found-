@@ -1,0 +1,7 @@
+<%- include('partials/header', { title: 'Error ' + code }) %>
+<section class="panel narrow center">
+  <h1><%= code === 404 ? 'Not found' : code === 403 ? 'Not allowed' : 'Error' %></h1>
+  <p><%= message %></p>
+  <p><a class="btn" href="/items">Back to the board</a></p>
+</section>
+<%- include('partials/footer') %>

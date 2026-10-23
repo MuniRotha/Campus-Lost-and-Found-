@@ -1,0 +1,17 @@
+<%- include('../partials/header', { title: 'Log in' }) %>
+<section class="panel narrow">
+  <h1>Log in</h1>
+  <% if (info) { %><div class="alert alert-success" role="status"><%= info %></div><% } %>
+  <%- include('../partials/errors', { errors }) %>
+  <form action="/login" method="post">
+    <label for="username">Username</label>
+    <input id="username" name="username" type="text" value="<%= values.username || '' %>" required autocomplete="username">
+
+    <label for="password">Password</label>
+    <input id="password" name="password" type="password" required autocomplete="current-password">
+
+    <button type="submit" class="btn">Log in</button>
+  </form>
+  <p>New here? <a href="/register">Create an account</a>.</p>
+</section>
+<%- include('../partials/footer') %>

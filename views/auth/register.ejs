@@ -1,0 +1,21 @@
+<%- include('../partials/header', { title: 'Register' }) %>
+<section class="panel narrow">
+  <h1>Create an account</h1>
+  <%- include('../partials/errors', { errors }) %>
+  <form action="/register" method="post" novalidate>
+    <label for="username">Username</label>
+    <input id="username" name="username" type="text" maxlength="30" value="<%= values.username || '' %>" required autocomplete="username">
+    <small>3-30 letters, numbers or underscores.</small>
+
+    <label for="email">Email</label>
+    <input id="email" name="email" type="email" maxlength="100" value="<%= values.email || '' %>" required autocomplete="email">
+
+    <label for="password">Password</label>
+    <input id="password" name="password" type="password" minlength="8" maxlength="72" required autocomplete="new-password">
+    <small>At least 8 characters.</small>
+
+    <button type="submit" class="btn">Register</button>
+  </form>
+  <p>Already registered? <a href="/login">Log in</a>.</p>
+</section>
+<%- include('../partials/footer') %>

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><%= typeof title !== 'undefined' ? title + ' | ' : '' %>Campus Lost &amp; Found</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="container nav">
+    <a class="brand" href="/items">Campus Lost &amp; Found</a>
+    <nav aria-label="Main navigation">
+      <a href="/items">Browse</a>
+      <% if (currentUser) { %>
+        <a href="/items/new">Post an item</a>
+        <a href="/items/mine">My posts</a>
+        <span class="who">Signed in as <strong><%= currentUser.username %></strong></span>
+        <form action="/logout" method="post" class="inline"><button type="submit" class="btn btn-small btn-light">Log out</button></form>
+      <% } else { %>
+        <a href="/login">Log in</a>
+        <a href="/register">Register</a>
+      <% } %>
+    </nav>
+  </div>
+</header>
+<main class="container">
+  <% if (flash) { %><div class="alert alert-<%= flash.type %>" role="status"><%= flash.text %></div><% } %>
