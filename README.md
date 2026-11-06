@@ -92,7 +92,7 @@ tests/smoke-test.js    optional automated check of the test scenarios
 
 ## Testing
 
-See [TESTING.md](TESTING.md). To re-run the automated checks, start the app and run `npm run test:smoke` in another terminal (it creates and removes its own test records).
+See [TESTING.md](TESTING.md). To re-run the automated checks, start the app and run `npm run test:smoke` in another terminal (it deletes the posts it creates but leaves two test users in the database; `npm run db:setup` resets everything).
 
 ## Known limitations
 
