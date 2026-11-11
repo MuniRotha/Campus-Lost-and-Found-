@@ -9,6 +9,7 @@ const router = express.Router();
 
 const KINDS = ['lost', 'found'];
 const STATUSES = ['open', 'resolved'];
+const PAGE_SIZE = 12;
 const UPLOAD_DIR = path.join(__dirname, '..', 'public', 'uploads');
 
 const isId = (v) => /^\d{1,10}$/.test(String(v)) && Number(v) > 0 && Number(v) <= 4294967295;
@@ -57,12 +58,25 @@ async function loadOwnedPost(req, res) {
   return post;
 }
 
-// Browse + search/filter
+// Page numbers to show, e.g. [1, '...', 4, 5, 6, '...', 12].
+function pageList(current, totalPages) {
+  const keep = new Set([1, totalPages, current - 1, current, current + 1]);
+  const out = [];
+  for (let n = 1; n <= totalPages; n++) {
+    if (!keep.has(n)) continue;
+    if (out.length && n - out[out.length - 1] > 1) out.push('...');
+    out.push(n);
+  }
+  return out;
+}
+
+// Browse + search/filter, 12 posts per page
 router.get('/', async (req, res, next) => {
   try {
-    const q = (req.query.q || '').trim().slice(0, 100);
+    const q = String(req.query.q || '').trim().slice(0, 100);
     const category = isId(req.query.category) ? req.query.category : '';
     const kind = KINDS.includes(req.query.kind) ? req.query.kind : '';
+    const requestedPage = isId(req.query.page) ? Number(req.query.page) : 1;
     const where = [];
     const params = [];
     if (q) {
@@ -72,9 +86,40 @@ router.get('/', async (req, res, next) => {
     }
     if (category) { where.push('p.category_id = ?'); params.push(category); }
     if (kind) { where.push('p.kind = ?'); params.push(kind); }
+    const whereSql = where.length ? 'WHERE ' + where.join(' AND ') : '';
+
+    // Count first, so a page number past the end shows the last page instead of an empty one.
+    const [[{ total }]] = await db.query(`SELECT COUNT(*) AS total FROM posts p ${whereSql}`, params);
+    const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+    const page = Math.min(requestedPage, totalPages);
+    const offset = (page - 1) * PAGE_SIZE;
     const [items] = await db.query(
-      `${SELECT_POST} ${where.length ? 'WHERE ' + where.join(' AND ') : ''} ORDER BY p.created_at DESC, p.id DESC`, params);
-    res.render('items/index', { items, categories: await getCategories(), filters: { q, category: String(category), kind } });
+      `${SELECT_POST} ${whereSql} ORDER BY p.created_at DESC, p.id DESC LIMIT ? OFFSET ?`, [...params, PAGE_SIZE, offset]);
+
+    // Links keep the current filters and only change the page.
+    const pageUrl = (n) => {
+      const qs = new URLSearchParams();
+      if (q) qs.set('q', q);
+      if (category) qs.set('category', category);
+      if (kind) qs.set('kind', kind);
+      if (n > 1) qs.set('page', String(n));
+      const str = qs.toString();
+      return '/items' + (str ? '?' + str : '');
+    };
+
+    res.render('items/index', {
+      items,
+      categories: await getCategories(),
+      filters: { q, category: String(category), kind },
+      pagination: {
+        page, totalPages, total,
+        from: total ? offset + 1 : 0,
+        to: offset + items.length,
+        pages: pageList(page, totalPages).map((n) => (n === '...' ? n : { n, url: pageUrl(n) })),
+        prevUrl: page > 1 ? pageUrl(page - 1) : null,
+        nextUrl: page < totalPages ? pageUrl(page + 1) : null
+      }
+    });
   } catch (err) { next(err); }
 });
 
