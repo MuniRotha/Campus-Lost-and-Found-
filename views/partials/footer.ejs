@@ -1,4 +1,24 @@
+  </div>
 </main>
-<footer class="site-footer"><div class="container">Campus Lost &amp; Found &middot; fictional sample data only</div></footer>
+
+<footer class="site-footer">
+  <div class="container">
+    <span>Campus Lost &amp; Found</span>
+    <span>All sample data is fictional.</span>
+  </div>
+</footer>
+
+<dialog class="dialog" id="confirm-dialog" aria-labelledby="confirm-title" aria-describedby="confirm-text">
+  <form method="dialog">
+    <h2 id="confirm-title">Are you sure?</h2>
+    <p id="confirm-text"></p>
+    <div class="dialog-actions">
+      <button type="submit" class="btn btn-outline" value="cancel" autofocus>Cancel</button>
+      <button type="submit" class="btn btn-destructive" value="confirm" id="confirm-ok">Delete</button>
+    </div>
+  </form>
+</dialog>
+
+<script src="/js/app.js" defer></script>
 </body>
 </html>

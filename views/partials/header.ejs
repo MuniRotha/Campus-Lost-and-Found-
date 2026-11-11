@@ -3,26 +3,106 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title><%= typeof title !== 'undefined' ? title + ' | ' : '' %>Campus Lost &amp; Found</title>
+  <title><%= typeof title !== 'undefined' ? title + ' · ' : '' %>Campus Lost &amp; Found</title>
+  <meta name="description" content="<%= typeof description !== 'undefined' ? description : 'Browse, post and manage lost and found items on campus.' %>">
+  <script>
+    // Apply the saved or system theme before the page paints, so there is no flash.
+    (function () {
+      var root = document.documentElement;
+      root.classList.add('js');
+      try {
+        var saved = localStorage.getItem('theme');
+        root.dataset.theme = saved || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      } catch (e) { root.dataset.theme = 'light'; }
+    })();
+  </script>
   <link rel="stylesheet" href="/style.css">
 </head>
 <body>
+<a href="#main" class="sr-only">Skip to content</a>
 <header class="site-header">
   <div class="container nav">
-    <a class="brand" href="/items">Campus Lost &amp; Found</a>
-    <nav aria-label="Main navigation">
-      <a href="/items">Browse</a>
+    <a class="brand" href="/items">
+      <span class="brand-mark"><%- icon('brand') %></span>
+      <span>Campus Lost &amp; Found</span>
+    </a>
+
+    <nav class="nav-links desktop-only" aria-label="Main">
+      <a class="nav-link" href="/items" <%- currentPath === '/items' ? 'aria-current="page"' : '' %>>Browse</a>
       <% if (currentUser) { %>
-        <a href="/items/new">Post an item</a>
-        <a href="/items/mine">My posts</a>
-        <span class="who">Signed in as <strong><%= currentUser.username %></strong></span>
-        <form action="/logout" method="post" class="inline"><button type="submit" class="btn btn-small btn-light">Log out</button></form>
-      <% } else { %>
-        <a href="/login">Log in</a>
-        <a href="/register">Register</a>
+        <a class="nav-link" href="/items/mine" <%- currentPath === '/items/mine' ? 'aria-current="page"' : '' %>>My posts</a>
       <% } %>
     </nav>
+
+    <div class="nav-right">
+      <a class="btn btn-sm desktop-only" href="/items/new"><%- icon('plus') %>Post an item</a>
+
+      <button type="button" class="btn btn-ghost btn-icon btn-sm theme-toggle" data-theme-toggle aria-label="Toggle dark mode">
+        <%- icon('sun', 'icon-sun') %><%- icon('moon', 'icon-moon') %>
+      </button>
+
+      <% if (currentUser) { %>
+        <details class="menu desktop-only" data-menu>
+          <summary class="avatar-btn" aria-label="Account menu for <%= currentUser.username %>">
+            <span class="avatar avatar-md avatar-c<%= colorFor(currentUser.username) %>"><%= initials(currentUser.username) %></span>
+          </summary>
+          <div class="menu-panel" role="menu">
+            <div class="menu-label">
+              <strong><%= currentUser.username %></strong>
+              <span class="muted small">Signed in</span>
+            </div>
+            <div class="menu-sep"></div>
+            <a class="menu-item" role="menuitem" href="/items/mine" <%- currentPath === '/items/mine' ? 'aria-current="page"' : '' %>><%- icon('list') %>My posts</a>
+            <a class="menu-item" role="menuitem" href="/items/new"><%- icon('plus') %>Post an item</a>
+            <div class="menu-sep"></div>
+            <form action="/logout" method="post">
+              <button type="submit" class="menu-item" role="menuitem"><%- icon('log-out') %>Log out</button>
+            </form>
+          </div>
+        </details>
+      <% } else { %>
+        <a class="btn btn-ghost btn-sm desktop-only" href="/login" <%- currentPath === '/login' ? 'aria-current="page"' : '' %>>Log in</a>
+        <a class="btn btn-outline btn-sm desktop-only" href="/register" <%- currentPath === '/register' ? 'aria-current="page"' : '' %>>Register</a>
+      <% } %>
+
+      <details class="menu mobile-only" data-menu>
+        <summary class="btn btn-ghost btn-icon btn-sm" aria-label="Open menu"><%- icon('menu') %></summary>
+        <nav class="sheet-panel" aria-label="Mobile">
+          <% if (currentUser) { %>
+            <div class="row menu-label">
+              <span class="avatar avatar-md avatar-c<%= colorFor(currentUser.username) %>"><%= initials(currentUser.username) %></span>
+              <strong><%= currentUser.username %></strong>
+            </div>
+            <div class="menu-sep"></div>
+          <% } %>
+          <a class="menu-item" href="/items" <%- currentPath === '/items' ? 'aria-current="page"' : '' %>><%- icon('search') %>Browse</a>
+          <a class="menu-item" href="/items/new"><%- icon('plus') %>Post an item</a>
+          <% if (currentUser) { %>
+            <a class="menu-item" href="/items/mine" <%- currentPath === '/items/mine' ? 'aria-current="page"' : '' %>><%- icon('list') %>My posts</a>
+            <div class="menu-sep"></div>
+            <form action="/logout" method="post">
+              <button type="submit" class="menu-item"><%- icon('log-out') %>Log out</button>
+            </form>
+          <% } else { %>
+            <div class="menu-sep"></div>
+            <a class="menu-item" href="/login" <%- currentPath === '/login' ? 'aria-current="page"' : '' %>><%- icon('user') %>Log in</a>
+            <a class="menu-item" href="/register" <%- currentPath === '/register' ? 'aria-current="page"' : '' %>><%- icon('plus') %>Register</a>
+          <% } %>
+        </nav>
+      </details>
+    </div>
   </div>
 </header>
-<main class="container">
-  <% if (flash) { %><div class="alert alert-<%= flash.type %>" role="status"><%= flash.text %></div><% } %>
+
+<div class="toaster" role="region" aria-label="Notifications" aria-live="polite">
+  <% if (flash) { %>
+    <div class="toast <%= flash.type %>" role="status" data-toast>
+      <%- icon(flash.type === 'success' ? 'check-circle' : 'alert-circle') %>
+      <span class="text"><%= flash.text %></span>
+      <button type="button" class="btn btn-ghost btn-icon btn-sm" data-toast-close aria-label="Dismiss notification"><%- icon('x') %></button>
+    </div>
+  <% } %>
+</div>
+
+<main id="main">
+  <div class="container">

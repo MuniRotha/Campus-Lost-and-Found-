@@ -3,6 +3,9 @@ const express = require('express');
 const session = require('express-session');
 const path = require('path');
 
+const { formatRelative, formatFull } = require('./lib/format');
+const { initials, colorFor } = require('./lib/avatar');
+const { icon } = require('./lib/icons');
 const authRoutes = require('./routes/auth');
 const itemRoutes = require('./routes/items');
 
@@ -14,6 +17,9 @@ if (!process.env.SESSION_SECRET) {
 const app = express();
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
+
+// View helpers available in every template.
+Object.assign(app.locals, { formatRelative, formatFull, initials, colorFor, icon });
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
@@ -28,6 +34,7 @@ app.use(session({
 app.use((req, res, next) => {
   res.locals.currentUser = req.session.user || null;
   res.locals.flash = req.session.flash || null;
+  res.locals.currentPath = req.path;
   delete req.session.flash;
   next();
 });
