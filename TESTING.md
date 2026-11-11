@@ -1,6 +1,6 @@
 # Testing table
 
-Tested on Node 22 with MariaDB 10.11 (MySQL-compatible). Scenarios 1-9 were run by `npm run test:smoke` (32 checks, all passed). The rows marked UI still need checking in a browser.
+Tested on Node 22 with MariaDB 10.11 (MySQL-compatible). Scenarios 1-9 and P1-P6 are run by `npm run test:smoke` (39 checks, all passed). The rows marked UI still need checking in a browser.
 
 | # | Action / input | Expected result | Actual result | Pass/Fail |
 |---|----------------|-----------------|---------------|-----------|
@@ -31,6 +31,14 @@ Tested on Node 22 with MariaDB 10.11 (MySQL-compatible). Scenarios 1-9 were run 
 | 8d | Log out, then open My posts | Redirected to login | 302 to /login | Pass |
 | 9a | Open /items/999999 | Friendly "could not be found" page | 404 page | Pass |
 | 9b | Open /items/abc | Friendly 404 page | 404 page | Pass |
+| P1 | Search a term that matches 13 posts | Page 1 shows 12 posts and "Showing 1–12 of 13" | 12 cards, correct text | Pass |
+| P2 | Look at the Next link on that search | Link keeps the search term and adds page=2 | `?q=...&page=2` | Pass |
+| P3 | Open page 2 | Shows post 13, page 2 marked current | "Showing 13–13 of 13" | Pass |
+| P4 | Open page=999 | Shows the last page instead of an error | Last page shown | Pass |
+| P5 | Open page=abc | Falls back to page 1 | Page 1 shown | Pass |
+| P6 | Send the q parameter twice | Page still loads | 200 | Pass |
 | 10 | Stop and restart the server, reload the board | Records still present | 11 sample posts after restart | Pass |
 | 11 (UI) | Browser: register, log in, create, search, edit, delete, log out | All steps work with labels and messages visible | Not run yet | Pending |
 | 12 (UI) | Click Delete in My posts | Confirmation dialog appears before deleting | Not run yet | Pending |
+| 13 (UI) | Toggle dark mode, reload the page | Theme switches and stays after reload | Not run yet | Pending |
+| 14 (UI) | Open the board at phone width (DevTools, 390 px) | Menu collapses to a button; filters and cards stack; nothing overlaps | Not run yet | Pending |

@@ -95,6 +95,28 @@ function check(name, cond, detail = '') { results.push({ name, pass: !!cond }); 
   r = await a(`/items/${id}/edit`, multi({ ...good }, { data: Buffer.concat([PNG, Buffer.alloc(2.5 * 1024 * 1024)]), type: 'image/png', name: 'big.png' }));
   check('7d Oversized image rejected', r.status === 400 && /2 MB/.test(r.text), r.status);
 
+  // Pagination (optional extension): 12 per page, filters kept in page links
+  const tag = 'Pager' + sfx;
+  const pagerIds = [];
+  for (let i = 1; i <= 13; i++) {
+    r = await a('/items', multi({ ...good, title: `${tag} item ${i}` }));
+    pagerIds.push((r.loc || '').split('/').pop());
+  }
+  r = await anon('/items?q=' + tag);
+  check('P1 First page shows 12 of 13', /Showing 1&ndash;12 of 13/.test(r.text) && (r.text.match(/class="card card-hover post-card/g) || []).length === 12);
+  check('P2 Next link keeps the search filter', r.text.includes(`href="/items?q=${tag}&amp;page=2"`));
+  r = await anon('/items?q=' + tag + '&page=2');
+  check('P3 Second page shows item 13', /Showing 13&ndash;13 of 13/.test(r.text) && /aria-current="page" aria-label="Page 2/.test(r.text));
+  r = await anon('/items?q=' + tag + '&page=999');
+  check('P4 Page past the end shows the last page', r.status === 200 && /Showing 13&ndash;13 of 13/.test(r.text));
+  r = await anon('/items?page=abc');
+  check('P5 Invalid page number falls back to page 1', r.status === 200 && /Showing 1&ndash;/.test(r.text));
+  r = await anon('/items?q=a&q=b');
+  check('P6 Repeated query parameter does not crash', r.status === 200);
+  for (const pid of pagerIds) await a(`/items/${pid}/delete`, { method: 'POST' });
+  r = await anon('/items?q=' + tag);
+  check('P7 Test posts cleaned up', /No items match/.test(r.text));
+
   // 9 missing record
   r = await anon('/items/999999');
   check('9a Nonexistent record -> 404 page', r.status === 404 && /could not be found/.test(r.text));
