@@ -1,32 +1,69 @@
-<%- include('../partials/header', { title: post.title }) %>
-<p><a href="/items">&larr; Back to board</a></p>
-<section class="panel detail">
-  <% if (post.image_path) { %>
-    <img src="/uploads/<%= post.image_path %>" alt="Photo of <%= post.title %>" class="detail-img">
-  <% } else { %>
-    <div class="detail-img placeholder" aria-label="No image provided">No image</div>
-  <% } %>
-  <div>
-    <div class="badges">
-      <span class="badge badge-<%= post.kind %>"><%= post.kind %></span>
-      <span class="badge badge-<%= post.status %>"><%= post.status %></span>
-      <span class="badge badge-cat"><%= post.category %></span>
-    </div>
-    <h1><%= post.title %></h1>
-    <p class="muted">Posted by <strong><%= post.owner %></strong> on <%= new Date(post.created_at).toLocaleDateString('en-GB') %><% if (post.location) { %> &middot; Location: <%= post.location %><% } %></p>
-    <p class="pre"><%= post.description %></p>
+<%- include('../partials/header', { title: post.title, description: post.description.slice(0, 150) }) %>
+<% const isOwner = currentUser && currentUser.id === post.user_id; %>
+<div class="stack">
+  <a class="back-link" href="/items"><%- icon('arrow-left') %>Back to board</a>
 
-    <% if (currentUser && currentUser.id === post.user_id) { %>
-      <div class="row-actions">
-        <a class="btn" href="/items/<%= post.id %>/edit">Edit</a>
-        <% if (post.status !== 'resolved') { %>
-          <form action="/items/<%= post.id %>/resolve" method="post" class="inline"><button type="submit" class="btn btn-light">Mark as resolved</button></form>
+  <div class="detail">
+    <div class="detail-media">
+      <% if (post.image_path) { %>
+        <img src="/uploads/<%= post.image_path %>" alt="Photo of <%= post.title %>">
+      <% } else { %>
+        <div class="placeholder" role="img" aria-label="No photo provided"><%- icon('image-off') %><span>No photo provided</span></div>
+      <% } %>
+    </div>
+
+    <aside class="detail-side">
+      <div class="card card-pad">
+        <div class="badges">
+          <span class="badge badge-<%= post.kind %>"><%= post.kind %></span>
+          <span class="badge badge-<%= post.status %>"><%= post.status %></span>
+          <span class="badge badge-cat"><%- icon('tag') %><%= post.category %></span>
+        </div>
+        <h1 style="margin-top:.875rem"><%= post.title %></h1>
+
+        <div class="owner" style="margin-top:1rem">
+          <span class="avatar avatar-lg avatar-c<%= colorFor(post.owner) %>"><%= initials(post.owner) %></span>
+          <div>
+            <strong><%= post.owner %><% if (isOwner) { %> <span class="muted small">(you)</span><% } %></strong>
+            <span class="muted small">Posted <time datetime="<%= new Date(post.created_at).toISOString() %>" title="<%= formatFull(post.created_at) %>"><%= formatRelative(post.created_at) %></time></span>
+          </div>
+        </div>
+        <% if (post.location) { %>
+          <p class="meta-row" style="margin-top:.75rem"><%- icon('map-pin') %><span><%= post.location %></span></p>
         <% } %>
-        <form action="/items/<%= post.id %>/delete" method="post" class="inline" onsubmit="return confirm('Delete this post permanently?');">
-          <button type="submit" class="btn btn-danger">Delete</button>
-        </form>
+
+        <hr class="separator">
+        <h2 class="sr-only">Description</h2>
+        <p class="description-text"><%= post.description %></p>
+        <hr class="separator">
+
+        <% if (isOwner) { %>
+          <div class="owner-actions">
+            <h2 class="small" style="font-size:.875rem">Manage your post</h2>
+            <p class="muted small">Only you can see these options.</p>
+            <div class="btn-row">
+              <a class="btn btn-outline btn-block" href="/items/<%= post.id %>/edit"><%- icon('pencil') %>Edit post</a>
+              <% if (post.status !== 'resolved') { %>
+                <form action="/items/<%= post.id %>/resolve" method="post" data-loading>
+                  <button type="submit" class="btn btn-secondary btn-block"><%- icon('loader', 'spinner') %><%- icon('check') %>Mark as resolved</button>
+                </form>
+              <% } %>
+              <form action="/items/<%= post.id %>/delete" method="post" data-loading
+                    data-confirm="This permanently deletes the post and its image. This cannot be undone."
+                    data-confirm-title="Delete this post?" data-confirm-label="Delete post">
+                <button type="submit" class="btn btn-destructive btn-block"><%- icon('loader', 'spinner') %><%- icon('trash') %>Delete post</button>
+              </form>
+            </div>
+          </div>
+        <% } else if (post.status === 'resolved') { %>
+          <div class="notice"><%- icon('check-circle') %><span>The owner has marked this item as resolved.</span></div>
+        <% } else if (!currentUser) { %>
+          <div class="notice"><%- icon('user') %><span>Have something to report? <a class="link" href="/login">Log in</a> to post an item.</span></div>
+        <% } else { %>
+          <div class="notice"><%- icon('clock') %><span>Updated <%= formatRelative(post.updated_at) %>.</span></div>
+        <% } %>
       </div>
-    <% } %>
+    </aside>
   </div>
-</section>
+</div>
 <%- include('../partials/footer') %>

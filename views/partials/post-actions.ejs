@@ -1,0 +1,20 @@
+<details class="menu" data-menu style="display:inline-block">
+  <summary class="btn btn-ghost btn-icon btn-sm" aria-label="Actions for <%= item.title %>">
+    <svg class="icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.75"/><circle cx="12" cy="12" r="1.75"/><circle cx="19" cy="12" r="1.75"/></svg>
+  </summary>
+  <div class="menu-panel" role="menu" style="min-width:11rem;text-align:left">
+    <a class="menu-item" role="menuitem" href="/items/<%= item.id %>"><%- icon('eye') %>View</a>
+    <a class="menu-item" role="menuitem" href="/items/<%= item.id %>/edit"><%- icon('pencil') %>Edit</a>
+    <% if (item.status !== 'resolved') { %>
+      <form action="/items/<%= item.id %>/resolve" method="post">
+        <button type="submit" class="menu-item" role="menuitem"><%- icon('check') %>Mark as resolved</button>
+      </form>
+    <% } %>
+    <div class="menu-sep"></div>
+    <form action="/items/<%= item.id %>/delete" method="post"
+          data-confirm="This permanently deletes &quot;<%= item.title %>&quot; and its image. This cannot be undone."
+          data-confirm-title="Delete this post?" data-confirm-label="Delete post">
+      <button type="submit" class="menu-item danger" role="menuitem"><%- icon('trash') %>Delete</button>
+    </form>
+  </div>
+</details>

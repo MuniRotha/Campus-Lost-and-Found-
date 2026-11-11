@@ -1,26 +1,59 @@
-<%- include('../partials/header', { title: 'My posts' }) %>
-<h1>My posts</h1>
-<% if (!items.length) { %>
-  <div class="panel center"><p>You have not posted anything yet.</p><p><a class="btn" href="/items/new">Post an item</a></p></div>
-<% } else { %>
-  <table class="table">
-    <thead><tr><th>Title</th><th>Type</th><th>Category</th><th>Status</th><th>Actions</th></tr></thead>
-    <tbody>
-    <% items.forEach(item => { %>
-      <tr>
-        <td><a href="/items/<%= item.id %>"><%= item.title %></a></td>
-        <td><span class="badge badge-<%= item.kind %>"><%= item.kind %></span></td>
-        <td><%= item.category %></td>
-        <td><span class="badge badge-<%= item.status %>"><%= item.status %></span></td>
-        <td class="row-actions">
-          <a class="btn btn-small" href="/items/<%= item.id %>/edit">Edit</a>
-          <form action="/items/<%= item.id %>/delete" method="post" class="inline" onsubmit="return confirm('Delete this post permanently?');">
-            <button type="submit" class="btn btn-small btn-danger">Delete</button>
-          </form>
-        </td>
-      </tr>
-    <% }) %>
-    </tbody>
-  </table>
-<% } %>
+<%- include('../partials/header', { title: 'My posts', description: 'Manage the lost and found items you have posted.' }) %>
+<div class="stack">
+  <div class="page-head">
+    <div>
+      <h1>My posts</h1>
+      <p class="muted"><%= items.length ? `You have ${items.length} post${items.length === 1 ? '' : 's'}. Only you can edit or delete them.` : 'Everything you post shows up here.' %></p>
+    </div>
+    <a class="btn" href="/items/new"><%- icon('plus') %>Post an item</a>
+  </div>
+
+  <% if (!items.length) { %>
+    <div class="card empty">
+      <span class="empty-icon"><%- icon('inbox') %></span>
+      <h2>You haven't posted anything yet</h2>
+      <p class="muted">Lost something, or found something that belongs to someone else? Post it so people on campus can help.</p>
+      <a class="btn" href="/items/new"><%- icon('plus') %>Post your first item</a>
+    </div>
+  <% } else { %>
+    <%# Desktop: table %>
+    <div class="card table-wrap show-md">
+      <table class="table">
+        <thead>
+          <tr><th scope="col">Title</th><th scope="col">Type</th><th scope="col">Category</th><th scope="col">Status</th><th scope="col">Created</th><th scope="col" class="actions-cell"><span class="sr-only">Actions</span></th></tr>
+        </thead>
+        <tbody>
+        <% items.forEach(item => { %>
+          <tr>
+            <td class="title-cell"><a href="/items/<%= item.id %>"><%= item.title %></a></td>
+            <td><span class="badge badge-<%= item.kind %>"><%= item.kind %></span></td>
+            <td><span class="badge badge-cat"><%= item.category %></span></td>
+            <td><span class="badge badge-<%= item.status %>"><%= item.status %></span></td>
+            <td class="muted"><time datetime="<%= new Date(item.created_at).toISOString() %>" title="<%= formatFull(item.created_at) %>"><%= formatRelative(item.created_at) %></time></td>
+            <td class="actions-cell"><%- include('../partials/post-actions', { item }) %></td>
+          </tr>
+        <% }) %>
+        </tbody>
+      </table>
+    </div>
+
+    <%# Mobile: stacked cards %>
+    <div class="mine-cards hide-md">
+      <% items.forEach(item => { %>
+        <div class="card mine-card">
+          <div class="head">
+            <a href="/items/<%= item.id %>"><h3><%= item.title %></h3></a>
+            <%- include('../partials/post-actions', { item }) %>
+          </div>
+          <div class="row-wrap">
+            <span class="badge badge-<%= item.kind %>"><%= item.kind %></span>
+            <span class="badge badge-<%= item.status %>"><%= item.status %></span>
+            <span class="badge badge-cat"><%= item.category %></span>
+          </div>
+          <p class="muted small">Posted <time datetime="<%= new Date(item.created_at).toISOString() %>"><%= formatRelative(item.created_at) %></time></p>
+        </div>
+      <% }) %>
+    </div>
+  <% } %>
+</div>
 <%- include('../partials/footer') %>

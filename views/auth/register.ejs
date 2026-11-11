@@ -1,21 +1,37 @@
-<%- include('../partials/header', { title: 'Register' }) %>
-<section class="panel narrow">
-  <h1>Create an account</h1>
-  <%- include('../partials/errors', { errors }) %>
-  <form action="/register" method="post" novalidate>
-    <label for="username">Username</label>
-    <input id="username" name="username" type="text" maxlength="30" value="<%= values.username || '' %>" required autocomplete="username">
-    <small>3-30 letters, numbers or underscores.</small>
-
-    <label for="email">Email</label>
-    <input id="email" name="email" type="email" maxlength="100" value="<%= values.email || '' %>" required autocomplete="email">
-
-    <label for="password">Password</label>
-    <input id="password" name="password" type="password" minlength="8" maxlength="72" required autocomplete="new-password">
-    <small>At least 8 characters.</small>
-
-    <button type="submit" class="btn">Register</button>
-  </form>
-  <p>Already registered? <a href="/login">Log in</a>.</p>
-</section>
+<%- include('../partials/header', { title: 'Register', description: 'Create an account to post lost and found items.' }) %>
+<div class="auth-wrap">
+  <div class="card auth-card">
+    <div class="card-body">
+      <div class="auth-head">
+        <span class="brand-mark" style="display:grid"><%- icon('brand') %></span>
+        <h1>Create an account</h1>
+        <p class="muted">It takes a minute. You'll need it to post and manage items.</p>
+      </div>
+      <div style="margin-top:1.25rem"><%- include('../partials/errors', { errors }) %></div>
+      <form action="/register" method="post" novalidate data-loading style="margin-top:1rem">
+        <div class="field">
+          <label class="label" for="username">Username</label>
+          <input id="username" class="input" name="username" type="text" maxlength="30" value="<%= values.username || '' %>" required autocomplete="username" aria-describedby="username-hint">
+          <p class="description" id="username-hint">3-30 letters, numbers or underscores.</p>
+        </div>
+        <div class="field">
+          <label class="label" for="email">Email</label>
+          <input id="email" class="input" name="email" type="email" maxlength="100" value="<%= values.email || '' %>" required autocomplete="email" placeholder="you@example.com">
+        </div>
+        <div class="field">
+          <label class="label" for="password">Password</label>
+          <div class="input-action">
+            <input id="password" class="input" name="password" type="password" minlength="8" maxlength="72" required autocomplete="new-password" aria-describedby="password-hint">
+            <button type="button" class="btn btn-ghost btn-icon btn-sm" data-password-toggle aria-controls="password" aria-pressed="false" aria-label="Show password">
+              <%- icon('eye', 'icon-eye') %><%- icon('eye-off', 'icon-eye-off') %>
+            </button>
+          </div>
+          <p class="description" id="password-hint">At least 8 characters.</p>
+        </div>
+        <button type="submit" class="btn btn-block" style="margin-top:1.5rem"><%- icon('loader', 'spinner') %>Create account</button>
+      </form>
+      <p class="auth-foot muted">Already have an account? <a class="link" href="/login">Log in</a></p>
+    </div>
+  </div>
+</div>
 <%- include('../partials/footer') %>

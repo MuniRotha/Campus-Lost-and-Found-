@@ -1,16 +1,27 @@
-<article class="card">
-  <% if (item.image_path) { %>
-    <img src="/uploads/<%= item.image_path %>" alt="Photo of <%= item.title %>" class="thumb">
-  <% } else { %>
-    <div class="thumb placeholder" aria-label="No image provided">No image</div>
-  <% } %>
-  <div class="card-body">
+<article class="card card-hover post-card<%= item.status === 'resolved' ? ' is-resolved' : '' %>">
+  <div class="media">
+    <% if (item.image_path) { %>
+      <img src="/uploads/<%= item.image_path %>" alt="Photo of <%= item.title %>" loading="lazy">
+    <% } else { %>
+      <div class="placeholder" role="img" aria-label="No photo provided"><%- icon('image-off') %><span>No photo</span></div>
+    <% } %>
     <div class="badges">
-      <span class="badge badge-<%= item.kind %>"><%= item.kind %></span>
-      <span class="badge badge-<%= item.status %>"><%= item.status %></span>
-      <span class="badge badge-cat"><%= item.category %></span>
+      <span class="badge badge-on-image badge-<%= item.kind %>"><%= item.kind %></span>
+      <span class="badge badge-on-image badge-<%= item.status %>"><%= item.status %></span>
     </div>
+  </div>
+  <div class="body">
+    <div class="row-wrap"><span class="badge badge-cat"><%- icon('tag') %><%= item.category %></span></div>
     <h3><a href="/items/<%= item.id %>"><%= item.title %></a></h3>
-    <p class="muted">By <%= item.owner %> &middot; <%= new Date(item.created_at).toLocaleDateString('en-GB') %><% if (item.location) { %> &middot; <%= item.location %><% } %></p>
+    <div class="meta-row">
+      <span class="avatar avatar-c<%= colorFor(item.owner) %>"><%= initials(item.owner) %></span>
+      <span>by <%= item.owner %></span>
+      <span class="dot" aria-hidden="true"></span>
+      <time datetime="<%= new Date(item.created_at).toISOString() %>" title="<%= formatFull(item.created_at) %>"><%= formatRelative(item.created_at) %></time>
+      <% if (item.location) { %>
+        <span class="dot" aria-hidden="true"></span>
+        <span class="row" style="gap:.25rem"><%- icon('map-pin') %><%= item.location %></span>
+      <% } %>
+    </div>
   </div>
 </article>

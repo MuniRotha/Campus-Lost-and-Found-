@@ -1,17 +1,35 @@
-<%- include('../partials/header', { title: 'Log in' }) %>
-<section class="panel narrow">
-  <h1>Log in</h1>
-  <% if (info) { %><div class="alert alert-success" role="status"><%= info %></div><% } %>
-  <%- include('../partials/errors', { errors }) %>
-  <form action="/login" method="post">
-    <label for="username">Username</label>
-    <input id="username" name="username" type="text" value="<%= values.username || '' %>" required autocomplete="username">
-
-    <label for="password">Password</label>
-    <input id="password" name="password" type="password" required autocomplete="current-password">
-
-    <button type="submit" class="btn">Log in</button>
-  </form>
-  <p>New here? <a href="/register">Create an account</a>.</p>
-</section>
+<%- include('../partials/header', { title: 'Log in', description: 'Log in to post and manage lost and found items.' }) %>
+<div class="auth-wrap">
+  <div class="card auth-card">
+    <div class="card-body">
+      <div class="auth-head">
+        <span class="brand-mark" style="display:grid"><%- icon('brand') %></span>
+        <h1>Welcome back</h1>
+        <p class="muted">Log in to post items and manage your posts.</p>
+      </div>
+      <div style="margin-top:1.25rem">
+        <% if (info) { %><div class="alert alert-success" role="status" style="margin-bottom:1rem"><%- icon('check-circle') %><span><%= info %></span></div><% } %>
+        <%- include('../partials/errors', { errors }) %>
+      </div>
+      <form action="/login" method="post" data-loading style="margin-top:1rem">
+        <div class="field">
+          <label class="label" for="username">Username</label>
+          <input id="username" class="input" name="username" type="text" value="<%= values.username || '' %>" required autocomplete="username" autofocus>
+        </div>
+        <div class="field">
+          <label class="label" for="password">Password</label>
+          <div class="input-action">
+            <input id="password" class="input" name="password" type="password" required autocomplete="current-password">
+            <button type="button" class="btn btn-ghost btn-icon btn-sm" data-password-toggle aria-controls="password" aria-pressed="false" aria-label="Show password">
+              <%- icon('eye', 'icon-eye') %><%- icon('eye-off', 'icon-eye-off') %>
+            </button>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-block" style="margin-top:1.5rem"><%- icon('loader', 'spinner') %>Log in</button>
+      </form>
+      <p class="demo-hint">Demo accounts: <code>demo1</code> or <code>demo2</code>, password <code>Demo1234!</code></p>
+      <p class="auth-foot muted">New here? <a class="link" href="/register">Create an account</a></p>
+    </div>
+  </div>
+</div>
 <%- include('../partials/footer') %>

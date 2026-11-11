@@ -1,46 +1,100 @@
-<%- include('../partials/header', { title: mode === 'new' ? 'New post' : 'Edit post' }) %>
-<section class="panel narrow">
-  <h1><%= mode === 'new' ? 'Post an item' : 'Edit post' %></h1>
+<% const isNew = mode === 'new'; %>
+<%- include('../partials/header', { title: isNew ? 'Post an item' : 'Edit post', description: isNew ? 'Report a lost or found item on campus.' : 'Update your lost or found post.' }) %>
+<div class="stack" style="max-width:42rem;margin:0 auto">
+  <a class="back-link" href="<%= isNew ? '/items' : '/items/' + post.id %>"><%- icon('arrow-left') %><%= isNew ? 'Back to board' : 'Back to post' %></a>
+  <div>
+    <h1><%= isNew ? 'Post an item' : 'Edit post' %></h1>
+    <p class="muted" style="margin-top:.375rem"><%= isNew ? 'Describe what you lost or found so the right person can recognise it.' : 'Changes are visible on the board straight away.' %></p>
+  </div>
+
   <%- include('../partials/errors', { errors }) %>
-  <form action="<%= mode === 'new' ? '/items' : '/items/' + post.id + '/edit' %>" method="post" enctype="multipart/form-data" novalidate>
-    <label for="title">Title</label>
-    <input id="title" name="title" type="text" maxlength="100" value="<%= post.title || '' %>" required>
 
-    <label for="kind">Did you lose it or find it?</label>
-    <select id="kind" name="kind" required>
-      <option value="lost" <%= post.kind === 'lost' ? 'selected' : '' %>>Lost</option>
-      <option value="found" <%= post.kind === 'found' ? 'selected' : '' %>>Found</option>
-    </select>
+  <form class="card card-pad" action="<%= isNew ? '/items' : '/items/' + post.id + '/edit' %>" method="post" enctype="multipart/form-data" novalidate data-loading>
+    <div class="field">
+      <span class="label" id="kind-label">Did you lose it or find it?</span>
+      <div class="choice-grid" role="radiogroup" aria-labelledby="kind-label">
+        <label class="choice">
+          <input type="radio" name="kind" value="lost" <%= post.kind === 'lost' ? 'checked' : '' %>>
+          <span class="choice-body"><span class="choice-title">I lost something</span><span class="muted small">Ask people to look out for it</span></span>
+        </label>
+        <label class="choice">
+          <input type="radio" name="kind" value="found" <%= post.kind === 'found' ? 'checked' : '' %>>
+          <span class="choice-body"><span class="choice-title">I found something</span><span class="muted small">Help the owner get it back</span></span>
+        </label>
+      </div>
+    </div>
 
-    <label for="category_id">Category</label>
-    <select id="category_id" name="category_id" required>
-      <option value="">Choose a category</option>
-      <% categories.forEach(c => { %><option value="<%= c.id %>" <%= String(post.category_id) === String(c.id) ? 'selected' : '' %>><%= c.name %></option><% }) %>
-    </select>
+    <div class="field">
+      <label class="label" for="title">Title</label>
+      <input id="title" class="input" name="title" type="text" maxlength="100" value="<%= post.title || '' %>" placeholder="e.g. Black wireless earbuds" required>
+      <p class="description">A short name for the item. Up to 100 characters.</p>
+    </div>
 
-    <label for="location">Location (optional)</label>
-    <input id="location" name="location" type="text" maxlength="100" value="<%= post.location || '' %>">
+    <div class="field-row">
+      <div class="field">
+        <label class="label" for="category_id">Category</label>
+        <select id="category_id" class="select" name="category_id" required>
+          <option value="">Choose a category</option>
+          <% categories.forEach(c => { %><option value="<%= c.id %>" <%= String(post.category_id) === String(c.id) ? 'selected' : '' %>><%= c.name %></option><% }) %>
+        </select>
+      </div>
+      <div class="field">
+        <label class="label" for="status">Status</label>
+        <select id="status" class="select" name="status">
+          <option value="open" <%= post.status === 'open' ? 'selected' : '' %>>Open</option>
+          <option value="resolved" <%= post.status === 'resolved' ? 'selected' : '' %>>Resolved</option>
+        </select>
+      </div>
+    </div>
 
-    <label for="description">Description</label>
-    <textarea id="description" name="description" rows="5" maxlength="2000" required><%= post.description || '' %></textarea>
+    <div class="field">
+      <label class="label" for="location">Location <span class="optional">(optional)</span></label>
+      <input id="location" class="input" name="location" type="text" maxlength="100" value="<%= post.location || '' %>" placeholder="e.g. Main Library, 2nd floor">
+    </div>
 
-    <label for="status">Status</label>
-    <select id="status" name="status">
-      <option value="open" <%= post.status === 'open' ? 'selected' : '' %>>Open</option>
-      <option value="resolved" <%= post.status === 'resolved' ? 'selected' : '' %>>Resolved</option>
-    </select>
+    <div class="field">
+      <label class="label" for="description">Description</label>
+      <textarea id="description" class="textarea" name="description" rows="6" maxlength="2000" required data-counter="description-count"
+                placeholder="Colour, brand, distinguishing marks, when and where you lost or found it."><%= post.description || '' %></textarea>
+      <div class="field-meta">
+        <p class="description">Don't include personal details such as phone numbers or ID numbers.</p>
+        <span class="description counter" id="description-count" aria-live="polite"></span>
+      </div>
+    </div>
 
-    <label for="image">Image (optional, JPEG or PNG, max 2 MB)</label>
-    <% if (mode === 'edit' && post.image_path) { %>
-      <p><img src="/uploads/<%= post.image_path %>" alt="Current image" class="thumb-small"></p>
-      <label class="check"><input type="checkbox" name="remove_image" value="1"> Remove current image</label>
-    <% } %>
-    <input id="image" name="image" type="file" accept="image/jpeg,image/png">
+    <div class="field" data-image-field>
+      <span class="label" id="image-label">Photo <span class="optional">(optional)</span></span>
+      <% if (!isNew && post.image_path) { %>
+        <div class="preview">
+          <img src="/uploads/<%= post.image_path %>" alt="Current photo of <%= post.title %>">
+          <div class="meta">
+            <div class="name">Current photo</div>
+            <label class="checkbox muted small"><input type="checkbox" name="remove_image" value="1"> Remove current photo</label>
+          </div>
+        </div>
+      <% } %>
+      <div class="dropzone">
+        <%- icon('upload', 'icon-lg') %>
+        <span><strong>Click to upload</strong> or drag and drop</span>
+        <span class="small">JPEG or PNG, up to 2 MB<%= !isNew && post.image_path ? '. A new photo replaces the current one.' : '' %></span>
+        <input id="image" name="image" type="file" accept="image/jpeg,image/png" aria-labelledby="image-label" aria-describedby="image-error" data-dropzone>
+      </div>
+      <div class="preview" data-preview hidden>
+        <img alt="Preview of the selected photo">
+        <div class="meta">
+          <div class="name" data-file-name></div>
+          <div class="muted small" data-file-size></div>
+        </div>
+        <button type="button" class="btn btn-ghost btn-sm" data-file-remove><%- icon('x') %>Remove</button>
+      </div>
+      <p class="field-error" id="image-error" data-file-error role="alert"></p>
+    </div>
 
-    <div class="row-actions">
-      <button type="submit" class="btn"><%= mode === 'new' ? 'Create post' : 'Save changes' %></button>
-      <a class="btn btn-light" href="<%= mode === 'new' ? '/items' : '/items/' + post.id %>">Cancel</a>
+    <hr class="separator">
+    <div class="row" style="justify-content:flex-end">
+      <a class="btn btn-ghost" href="<%= isNew ? '/items' : '/items/' + post.id %>">Cancel</a>
+      <button type="submit" class="btn"><%- icon('loader', 'spinner') %><%= isNew ? 'Create post' : 'Save changes' %></button>
     </div>
   </form>
-</section>
+</div>
 <%- include('../partials/footer') %>

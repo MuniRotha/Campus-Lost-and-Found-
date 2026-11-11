@@ -1,0 +1,31 @@
+<% if (pagination.totalPages > 1) { %>
+  <nav class="pagination" aria-label="Pagination">
+    <ul>
+      <li>
+        <% if (pagination.prevUrl) { %>
+          <a class="btn btn-ghost" href="<%= pagination.prevUrl %>" rel="prev"><%- icon('chevron-left') %>Previous</a>
+        <% } else { %>
+          <span class="btn btn-ghost" aria-disabled="true"><%- icon('chevron-left') %>Previous</span>
+        <% } %>
+      </li>
+      <% pagination.pages.forEach(p => { %>
+        <li>
+          <% if (p === '...') { %>
+            <span class="ellipsis" aria-hidden="true">&hellip;</span>
+          <% } else if (p.n === pagination.page) { %>
+            <a class="btn btn-ghost" href="<%= p.url %>" aria-current="page" aria-label="Page <%= p.n %>, current page"><%= p.n %></a>
+          <% } else { %>
+            <a class="btn btn-ghost" href="<%= p.url %>" aria-label="Page <%= p.n %>"><%= p.n %></a>
+          <% } %>
+        </li>
+      <% }) %>
+      <li>
+        <% if (pagination.nextUrl) { %>
+          <a class="btn btn-ghost" href="<%= pagination.nextUrl %>" rel="next">Next<%- icon('chevron-right') %></a>
+        <% } else { %>
+          <span class="btn btn-ghost" aria-disabled="true">Next<%- icon('chevron-right') %></span>
+        <% } %>
+      </li>
+    </ul>
+  </nav>
+<% } %>
