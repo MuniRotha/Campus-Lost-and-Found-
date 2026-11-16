@@ -1,6 +1,10 @@
-# Testing table
+# Testing
 
-Tested on Node 22 with MariaDB 10.11 (MySQL-compatible). Scenarios 1-9 and P1-P6 are run by `npm run test:smoke` (39 checks, all passed). The rows marked UI still need checking in a browser.
+Tested on Node 22 with MariaDB 10.11 (MySQL-compatible).
+
+- Rows 1 to 9 and P1 to P6 are covered by `npm run test:smoke` (39 checks, all passing). Start the app, then run it in a second terminal.
+- Row 10 was checked by restarting the server.
+- Rows 11 to 14 were run in Chromium with Playwright against the running app.
 
 | # | Action / input | Expected result | Actual result | Pass/Fail |
 |---|----------------|-----------------|---------------|-----------|
@@ -38,7 +42,7 @@ Tested on Node 22 with MariaDB 10.11 (MySQL-compatible). Scenarios 1-9 and P1-P6
 | P5 | Open page=abc | Falls back to page 1 | Page 1 shown | Pass |
 | P6 | Send the q parameter twice | Page still loads | 200 | Pass |
 | 10 | Stop and restart the server, reload the board | Records still present | 11 sample posts after restart | Pass |
-| 11 (UI) | Browser: register, log in, create, search, edit, delete, log out | All steps work with labels and messages visible | Not run yet | Pending |
-| 12 (UI) | Click Delete in My posts | Confirmation dialog appears before deleting | Not run yet | Pending |
-| 13 (UI) | Toggle dark mode, reload the page | Theme switches and stays after reload | Not run yet | Pending |
-| 14 (UI) | Open the board at phone width (DevTools, 390 px) | Menu collapses to a button; filters and cards stack; nothing overlaps | Not run yet | Pending |
+| 11 (UI) | Browser: register, log in, create a post with a photo, search for it, edit it, delete it, log out | Every step works, with labels and messages visible | Each step passed; toasts shown after register, create, edit, delete and logout | Pass |
+| 12 (UI) | Click Delete on a post | A confirmation dialog opens first; Cancel keeps the post, Delete removes it | Dialog opened; Cancel kept the post; Delete removed it (404 afterwards) | Pass |
+| 13 (UI) | Toggle dark mode, reload the page | Theme switches and stays after reload | Switched from light to dark and stayed dark after reload | Pass |
+| 14 (UI) | Open the site at phone width (390 px) | Menu collapses to a button; filters and cards stack; no sideways scrolling | Board, login, register and detail pages fit with no horizontal scroll; menu button opens the mobile menu | Pass |
